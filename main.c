@@ -1,9 +1,3 @@
-/*
-* To do list 
-	-	addToHistory function - gotta do fix size
-	-	implement background process via & 
-	-	implement fork via exec() 
-*/ 
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <stdbool.h> //the boolean library 
@@ -16,11 +10,20 @@
 char* trimLine(char* str) //remove leading/trailing whitespace 
 { 	//tried to find code without memory leaks 
 	char* end; 
+
 	while(isspace((unsigned char)*str)) str++; //trim leading 
+	
+	if(*str == 0) //All spaces? 
+		return str; 
+
+	//Trim trailing space 
 	end = str + strlen(str) - 1; 
-	while(end> str && isspace((unsigned char)* end)) end--; 
-	*(end + 1) = '\0'; 
-	return (str); 
+	while(end > str && isspace ((unsigned char)*end)) end--; 
+
+	//write new null terminator character 
+	end[1] = '\0'; 
+
+	return str; 
 }
 
 void addToHistory(char* fileName, char* str) 
@@ -58,6 +61,15 @@ void displayHistory(char* fileName){
 	fclose(fp); 
 }
 
+/*
+* To do list 
+	-	fix where I can print the whole line (rather than chunks)(!!!)
+	-	addToHistory function - gotta do fix size
+	-	implement background process via & 
+	-	implement fork via exec() with multiple arg 
+		-	first, gotta break command into multiple arguments by space 
+*/ 
+
 int main(int argc, char *argv[])
 {
 	int byte_size = 250; 
@@ -66,17 +78,22 @@ int main(int argc, char *argv[])
 	char* quit = "quit()"; 
 	char* showHistory = "history"; //display history command 
 	char* fileName = "historyShell.txt"; 
-	int pid; 
+	int pid, count; 
+	char* token; 
+	char* args[15]; //arguemnts to pass 
+	char delim[] = " "; //to split the strings 
 
 	do{ // a do while loop 
 		printf("$: ");
 		scanf("%s", enteredValue); 
+		addToHistory(fileName, enteredValue); 
 		
 		if(enteredValue[strlen(enteredValue)] == '\n')
 			enteredValue[strlen(enteredValue)] = '\0'; //remove \n at the end
 		command = trimLine(enteredValue); //remove leading/trailing whitespace 
+		printf("%s\n", command);
 
-		addToHistory(fileName, command); 
+		//breaking down command into args via spaces. 
 
 		//if history, print out the file 
 		if(strcmp(command, showHistory) == 0)
@@ -85,15 +102,24 @@ int main(int argc, char *argv[])
 		else if(strcmp(command, quit) == 0)
 			break; 
 
-		pid = fork(); //and it goes into two different directions...
-		if(pid == 0){ //child 
-			execvp(command, args); //fix here <--
-			perror("exec"); 
-			exit(1); 
-		}
-		else{ //parents 
-			wait(NULL); 
-		}
+		//split the command here into args[]
+		/*count = 0; 
+		while((token = strsep(&command, delim)) != NULL)
+		{
+			args[count] = token; 
+			printf("%s\n", args[count]);
+			count++ ; 
+		}*/ 
+
+		//pid = fork(); //and it goes into two different directions...
+		//if(pid == 0){ //child 
+			//execvp(command, args); //fix here <--
+			//perror("exec"); 
+			//exit(1); 
+		//}
+		//else{ //parents 
+			//wait(NULL); //waiting for the child process (aka exec()) to finish 
+		//}
 
 	} while(1); 
 

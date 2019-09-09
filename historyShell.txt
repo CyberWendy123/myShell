@@ -1,0 +1,10 @@
+a
+song
+to
+print
+out
+of
+quit()
+hello
+world
+quit()
