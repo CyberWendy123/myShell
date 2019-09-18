@@ -5,7 +5,7 @@
 #include <string.h> 
 #include <unistd.h> 
 #include <sys/wait.h>
-#include <sys/types.h> 
+#include <sys/types.h>   
 
 char* trimLine(char* str) //remove leading/trailing whitespace 
 { 	//tried to find code without memory leaks 
